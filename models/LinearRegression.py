@@ -8,7 +8,9 @@ class LinearRegression:
         self.weights = None
         self.bias = bias
 
-    def predict(self, X):
+    def predict(self, X, type=False):
+        if not type:
+            X = np.column_stack([np.ones(X.shape[0]), X])
         return X @ self.weights
 
     def loss_function(self, y_true, y_pred):
@@ -16,21 +18,16 @@ class LinearRegression:
         return (1.0 / n) * (((y_true - y_pred) ** 2).sum())
 
     def gradient(self, X, y):
-        y_pred = self.predict(X)
+        y_pred = self.predict(X, True)
         error = y - y_pred
-        if self.bias:
-            X = np.column_stack([np.ones(X.shape[0]), X])
-        n = X.shape[0]
-        grad = (-2.0 / n) * (X.T @ error)
+        grad = (-2.0 / X.shape[0]) * (X.T @ error)
         return grad
 
     def fit(self, X, y):
-        n_features = X.shape[1]
         if self.bias:
-            self.weights = np.zeros(n_features + 1)
-        else:
-            self.weights = np.zeros(n_features)
+            X = np.column_stack([np.ones(X.shape[0]), X])
 
+        self.weights = np.zeros(X.shape[1])
         for epoch in range(self.epochs):
             grad = self.gradient(X, y)
             self.weights -= self.lr * grad
@@ -43,16 +40,14 @@ class LassoRegression(LinearRegression):
 
     def loss_function(self, y_true, y_pred):
         n = y_true.shape[0]
-        return (1.0 / n) * (((y_true - y_pred) ** 2).sum()) + self.lambda_ * (abs(self.weights)).sum()
+        return (1.0 / n) * (((y_true - y_pred) ** 2).sum()) + self.lambda_ * ((abs(self.weights)).sum())
 
     def gradient(self, X, y):
-        y_pred = self.predict(X)
+        y_pred = self.predict(X, True)
         error = y - y_pred
-        if self.bias:
-            X = np.column_stack([np.ones(X.shape[0]), X])
-        n = X.shape[0]
-        grad = (-2.0 / n) * (X.T @ error) + self.lambda_ * np.sign(self.weights)
+        grad = (-2.0 / X.shape[0]) * (X.T @ error) + self.lambda_ * np.sign(self.weights)
         return grad
+
 
 class RidgeRegression(LinearRegression):
     def __init__(self, learning_rate=0.01, epochs=1000, bias=True, lambda_=0.1):
@@ -61,15 +56,12 @@ class RidgeRegression(LinearRegression):
 
     def loss_function(self, y_true, y_pred):
         n = y_true.shape[0]
-        return (1.0 / n) * (((y_true - y_pred) ** 2).sum()) + self.lambda_ * (self.weights ** 2).sum()
+        return (1.0 / n) * (((y_true - y_pred) ** 2).sum()) + self.lambda_ * ((self.weights ** 2).sum())
 
     def gradient(self, X, y):
-        y_pred = self.predict(X)
+        y_pred = self.predict(X, True)
         error = y - y_pred
-        if self.bias:
-            X = np.column_stack([np.ones(X.shape[0]), X])
-        n = X.shape[0]
-        grad = (-2.0 / n) * (X.T @ error) + 2 * self.lambda_ * self.weights
+        grad = (-2.0 / X.shape[0]) * (X.T @ error) + 2 * self.lambda_ * self.weights
         return grad
 
 
