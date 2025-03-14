@@ -8,9 +8,7 @@ class LinearRegression:
         self.weights = None
         self.bias = bias
 
-    def predict(self, X, type=False):
-        if not type:
-            X = np.column_stack([np.ones(X.shape[0]), X])
+    def predict(self, X):
         return X @ self.weights
 
     def loss_function(self, y_true, y_pred):
@@ -18,7 +16,7 @@ class LinearRegression:
         return (1.0 / n) * (((y_true - y_pred) ** 2).sum())
 
     def gradient(self, X, y):
-        y_pred = self.predict(X, True)
+        y_pred = self.predict(X)
         error = y - y_pred
         grad = (-2.0 / X.shape[0]) * (X.T @ error)
         return grad
@@ -43,7 +41,7 @@ class LassoRegression(LinearRegression):
         return (1.0 / n) * (((y_true - y_pred) ** 2).sum()) + self.lambda_ * ((abs(self.weights)).sum())
 
     def gradient(self, X, y):
-        y_pred = self.predict(X, True)
+        y_pred = self.predict(X)
         error = y - y_pred
         grad = (-2.0 / X.shape[0]) * (X.T @ error) + self.lambda_ * np.sign(self.weights)
         return grad
@@ -59,7 +57,7 @@ class RidgeRegression(LinearRegression):
         return (1.0 / n) * (((y_true - y_pred) ** 2).sum()) + self.lambda_ * ((self.weights ** 2).sum())
 
     def gradient(self, X, y):
-        y_pred = self.predict(X, True)
+        y_pred = self.predict(X)
         error = y - y_pred
         grad = (-2.0 / X.shape[0]) * (X.T @ error) + 2 * self.lambda_ * self.weights
         return grad

@@ -39,3 +39,6 @@ class LogisticRegression:
 
     def predict(self, X, type=False):
         return (self.prob(X, type) > 0.5).astype(int)
+
+
+    
