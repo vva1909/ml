@@ -45,20 +45,3 @@ class SoftmaxRegression:
     def predict(self, X):
         A = self.softmax_stable(X.dot(self.W))
         return np.argmax(A, axis=1)
-
-d = 100
-C = 3
-N = 3000
-X = np.random.randn(N, d)
-y = np.random.randint(0, C, N)
-W = np.random.randn(d, C)
-softmax = SoftmaxRegression(learning_rate=0.01, epochs=100, batch_size=10)
-X = (X - X.mean(axis=0)) / X.std(axis=0)
-W, loss_hist = softmax.fit(X, y)
-import matplotlib.pyplot as plt
-y_pred = softmax.predict(X)
-correct_count = np.sum(y == y_pred)
-print(f"Arcurrency: {correct_count/len(y)}")
-print(loss_hist[-1])
-plt.plot(loss_hist)
-plt.show()
